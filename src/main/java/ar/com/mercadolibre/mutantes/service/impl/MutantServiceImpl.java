@@ -1,6 +1,9 @@
 package ar.com.mercadolibre.mutantes.service.impl;
 
+import ar.com.mercadolibre.mutantes.domain.Human;
+import ar.com.mercadolibre.mutantes.dto.StatsDTO;
 import ar.com.mercadolibre.mutantes.exception.DnaException;
+import ar.com.mercadolibre.mutantes.repository.HumanRepository;
 import ar.com.mercadolibre.mutantes.service.MutantService;
 import ar.com.mercadolibre.mutantes.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +18,10 @@ public class MutantServiceImpl implements MutantService {
     @Autowired
     private StringUtil stringUtil;
 
-    private static final String ALLOWED_NITRO_BASES = "[ATCG]+";
+    @Autowired
+    private HumanRepository humanRepository;
+
+    private static final String ALLOWED_NITROGEN_BASES = "[ATCG]+";
 
     private static final int MINIMUM_MUTANT_SEQUENCE = 4;
 
@@ -29,17 +35,27 @@ public class MutantServiceImpl implements MutantService {
 
         countMatched = searchHorizontally(matrix);
 
-        if (countMatched > 1) return true;
+        if (countMatched > 1) {
+            save(dna, true);
+            return true;
+        }
 
         countMatched += searchVertically(matrix);
 
-        if (countMatched > 1) return true;
+        if (countMatched > 1) {
+            save(dna, true);
+            return true;
+        }
 
         countMatched += searchDiagonally(matrix);
 
-        if (countMatched > 1) return true;
+        if (countMatched > 1) {
+            save(dna, true);
+            return true;
+        }
 
         countMatched += searchAntiDiagonally(matrix);
+        save(dna, countMatched > 1);
 
         return countMatched > 1;
     }
@@ -47,19 +63,42 @@ public class MutantServiceImpl implements MutantService {
     @Override
     public void validateDna(String[] dna) {
         if(Objects.isNull(dna) || dna.length == 0)
-            throw new DnaException("ADN no puede ser nulo");
+            throw new DnaException("El ADN no puede ser nulo");
 
         if(dna.length < MINIMUM_MUTANT_SEQUENCE)
-            throw new DnaException("Secuencias de ADN pequeña, minimo debe ser una matrix 4x4");
+            throw new DnaException("Las secuencias de ADN son pequeñas, minimo debe ser una matrix 4x4");
 
         if(Stream.of(dna).anyMatch(String::isEmpty))
-            throw new DnaException("ADN no puede tener secuencias vacias");
+            throw new DnaException("El ADN no puede tener secuencias vacias");
 
         if(Stream.of(dna).anyMatch(s -> s.length() != dna.length))
             throw new DnaException("Las secuencias de ADN no son una matrix NxN");
 
-        if(!Stream.of(dna).allMatch(s -> s.matches(ALLOWED_NITRO_BASES)))
-            throw new DnaException("ADN no puede tener un caracter distinto a [A, T, C, G]");
+        if(!Stream.of(dna).allMatch(s -> s.matches(ALLOWED_NITROGEN_BASES)))
+            throw new DnaException("El ADN no puede tener bases nitrogenadas distintas a [A, T, C, G]");
+    }
+
+    @Override
+    public void save(String[] dna, boolean isMutant) {
+        Human newHuman = new Human();
+        newHuman.setDna(dna);
+        newHuman.setMutant(isMutant);
+        humanRepository.save(newHuman);
+    }
+
+    @Override
+    public StatsDTO getStats() {
+
+        StatsDTO stats = new StatsDTO();
+
+        Long countHuman = humanRepository.countByMutant(false);
+        Long countMutant = humanRepository.countByMutant(true);
+
+        stats.setCountHumanDna(countHuman);
+        stats.setCountMutantDna(countMutant);
+        stats.setRatio(countHuman == 0 ? 1d : (double)countMutant/(double)countHuman);
+
+        return stats;
     }
 
     private int searchAntiDiagonally(char[][] matrix) {

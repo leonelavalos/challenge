@@ -26,4 +26,9 @@ public class MutantController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.toString());
         }
     }
+
+    @GetMapping("stats")
+    public ResponseEntity<?> getStats() {
+        return ResponseEntity.status(HttpStatus.OK).body(mutantService.getStats());
+    }
 }
