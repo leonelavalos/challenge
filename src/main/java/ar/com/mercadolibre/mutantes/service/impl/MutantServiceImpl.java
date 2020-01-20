@@ -80,25 +80,17 @@ public class MutantServiceImpl implements MutantService {
 
     @Override
     public void save(String[] dna, boolean isMutant) {
-        Human newHuman = new Human();
-        newHuman.setDna(dna);
-        newHuman.setMutant(isMutant);
+        Human newHuman = new Human(dna, isMutant);
         humanRepository.save(newHuman);
     }
 
     @Override
     public StatsDTO getStats() {
 
-        StatsDTO stats = new StatsDTO();
-
         Long countHuman = humanRepository.countByMutant(false);
         Long countMutant = humanRepository.countByMutant(true);
 
-        stats.setCountHumanDna(countHuman);
-        stats.setCountMutantDna(countMutant);
-        stats.setRatio(countHuman == 0 ? 1d : (double)countMutant/(double)countHuman);
-
-        return stats;
+        return new StatsDTO(countHuman, countMutant);
     }
 
     private int searchAntiDiagonally(char[][] matrix) {
