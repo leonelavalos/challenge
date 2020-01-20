@@ -1,9 +1,13 @@
 package ar.com.mercadolibre.mutantes.service.impl;
 
+import ar.com.mercadolibre.mutantes.exception.DnaException;
 import ar.com.mercadolibre.mutantes.service.MutantService;
 import ar.com.mercadolibre.mutantes.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
+import java.util.stream.Stream;
 
 @Service
 public class MutantServiceImpl implements MutantService {
@@ -11,11 +15,17 @@ public class MutantServiceImpl implements MutantService {
     @Autowired
     private StringUtil stringUtil;
 
+    private static final String ALLOWED_NITRO_BASES = "[ATCG]+";
+
+    private static final int MINIMUM_MUTANT_SEQUENCE = 4;
+
     @Override
     public boolean isMutant(String[] dna) {
 
         char[][] matrix = stringUtil.convertToCharArray(dna);
         int countMatched = 0;
+
+        validateDna(dna);
 
         countMatched = searchHorizontally(matrix);
 
@@ -34,15 +44,33 @@ public class MutantServiceImpl implements MutantService {
         return countMatched > 1;
     }
 
-    public int searchAntiDiagonally(char[][] matrix) {
+    @Override
+    public void validateDna(String[] dna) {
+        if(Objects.isNull(dna) || dna.length == 0)
+            throw new DnaException("ADN no puede ser nulo");
+
+        if(dna.length < MINIMUM_MUTANT_SEQUENCE)
+            throw new DnaException("Secuencias de ADN pequeña, minimo debe ser una matrix 4x4");
+
+        if(Stream.of(dna).anyMatch(String::isEmpty))
+            throw new DnaException("ADN no puede tener secuencias vacias");
+
+        if(Stream.of(dna).anyMatch(s -> s.length() != dna.length))
+            throw new DnaException("Las secuencias de ADN no son una matrix NxN");
+
+        if(!Stream.of(dna).allMatch(s -> s.matches(ALLOWED_NITRO_BASES)))
+            throw new DnaException("ADN no puede tener un caracter distinto a [A, T, C, G]");
+    }
+
+    private int searchAntiDiagonally(char[][] matrix) {
         int length = matrix.length;
         int countMatched = 0;
 
         for (int k = 0; k <= 2 * (length - 1); ++k) {
             int charRepetition = 1;
             int jMin = Math.max(0, k - matrix.length + 1);
-            int jMai = Math.min(matrix.length - 1, k);
-            for (int j = jMin; j < jMai; ++j) {
+            int jMax = Math.min(matrix.length - 1, k);
+            for (int j = jMin; j < jMax; ++j) {
                 int i = k - j;
 
                 if (matrix[j][i] == matrix[j + 1][i - 1]) {
@@ -61,7 +89,7 @@ public class MutantServiceImpl implements MutantService {
         return countMatched;
     }
 
-    public int searchDiagonally(char[][] matrix) {
+    private int searchDiagonally(char[][] matrix) {
         int length = matrix.length;
         int countMatched = 0;
 
