@@ -4,8 +4,10 @@ import ar.com.mercadolibre.mutantes.dto.DnaDTO;
 import ar.com.mercadolibre.mutantes.service.MutantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @CrossOrigin(origins = "*", methods= {RequestMethod.GET, RequestMethod.POST})
@@ -15,7 +17,7 @@ public class MutantController {
     @Autowired
     private MutantService mutantService;
 
-    @PostMapping("mutant")
+    @PostMapping(value = "mutant", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> isMutant(@RequestBody DnaDTO dna) {
         try {
             if(mutantService.isMutant(dna.getDna()))

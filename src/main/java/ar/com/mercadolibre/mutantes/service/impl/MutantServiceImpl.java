@@ -4,6 +4,7 @@ import ar.com.mercadolibre.mutantes.domain.Human;
 import ar.com.mercadolibre.mutantes.dto.StatsDTO;
 import ar.com.mercadolibre.mutantes.exception.DnaException;
 import ar.com.mercadolibre.mutantes.repository.HumanRepository;
+import ar.com.mercadolibre.mutantes.service.MessageService;
 import ar.com.mercadolibre.mutantes.service.MutantService;
 import ar.com.mercadolibre.mutantes.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,20 +16,20 @@ import java.util.stream.Stream;
 @Service
 public class MutantServiceImpl implements MutantService {
 
-    @Autowired
-    private StringUtil stringUtil;
-
-    @Autowired
-    private HumanRepository humanRepository;
-
     private static final String ALLOWED_NITROGEN_BASES = "[ATCG]+";
 
     private static final int MINIMUM_MUTANT_SEQUENCE = 4;
 
+    @Autowired
+    private HumanRepository humanRepository;
+
+    @Autowired
+    private MessageService messageService;
+
     @Override
     public boolean isMutant(String[] dna) {
 
-        char[][] matrix = stringUtil.convertToCharArray(dna);
+        char[][] matrix = StringUtil.convertToCharArray(dna);
         int countMatched = 0;
 
         validateDna(dna);
@@ -63,19 +64,19 @@ public class MutantServiceImpl implements MutantService {
     @Override
     public void validateDna(String[] dna) {
         if(Objects.isNull(dna) || dna.length == 0)
-            throw new DnaException("El ADN no puede ser nulo");
+            throw new DnaException(messageService.getMessage("dna.empty"));
 
         if(dna.length < MINIMUM_MUTANT_SEQUENCE)
-            throw new DnaException("Las secuencias de ADN son pequeñas, minimo debe ser una matrix 4x4");
+            throw new DnaException(messageService.getMessage("dna.sequence.minimum.mutant"));
 
         if(Stream.of(dna).anyMatch(String::isEmpty))
-            throw new DnaException("El ADN no puede tener secuencias vacias");
+            throw new DnaException(messageService.getMessage("dna.sequence.empty"));
 
         if(Stream.of(dna).anyMatch(s -> s.length() != dna.length))
-            throw new DnaException("Las secuencias de ADN no son una matrix NxN");
+            throw new DnaException(messageService.getMessage("dna.invalid.format.table"));
 
         if(!Stream.of(dna).allMatch(s -> s.matches(ALLOWED_NITROGEN_BASES)))
-            throw new DnaException("El ADN no puede tener bases nitrogenadas distintas a [A, T, C, G]");
+            throw new DnaException(messageService.getMessage("dna.invalid.nitrogen.bases"));
     }
 
     @Override
