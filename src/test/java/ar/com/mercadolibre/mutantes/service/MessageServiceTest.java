@@ -26,7 +26,7 @@ public class MessageServiceTest {
 
     @Test
     public void testInvalidDna1() {
-        Exception exception = assertThrows(DnaException.class, () -> mutantService.isMutant(DNA_NULL));
+        Exception exception = assertThrows(DnaException.class, () -> mutantService.isValid(DNA_NULL));
 
         String expectedMessage = "El ADN no puede ser nulo";
         String actualMessage = exception.getMessage();
@@ -35,7 +35,7 @@ public class MessageServiceTest {
     }
     @Test
     public void testInvalidDna2() {
-        Exception exception = assertThrows(DnaException.class, () -> mutantService.isMutant(DNA_SMALL));
+        Exception exception = assertThrows(DnaException.class, () -> mutantService.isValid(DNA_SMALL));
 
         String expectedMessage = "Las secuencias de ADN son pequeñas, minimo debe ser una matrix 4x4";
         String actualMessage = exception.getMessage();
@@ -44,7 +44,7 @@ public class MessageServiceTest {
     }
     @Test
     public void testInvalidDna3() {
-        Exception exception = assertThrows(DnaException.class, () -> mutantService.isMutant(DNA_SEQUENCE_EMPTY));
+        Exception exception = assertThrows(DnaException.class, () -> mutantService.isValid(DNA_SEQUENCE_EMPTY));
 
         String expectedMessage = "El ADN no puede tener secuencias vacias";
         String actualMessage = exception.getMessage();
@@ -53,7 +53,7 @@ public class MessageServiceTest {
     }
     @Test
     public void testInvalidDna4() {
-        Exception exception = assertThrows(DnaException.class, () -> mutantService.isMutant(DNA_NxM));
+        Exception exception = assertThrows(DnaException.class, () -> mutantService.isValid(DNA_NxM));
 
         String expectedMessage = "Las secuencias de ADN no son una matrix NxN";
         String actualMessage = exception.getMessage();
@@ -62,7 +62,7 @@ public class MessageServiceTest {
     }
     @Test
     public void testInvalidDna5() {
-        Exception exception = assertThrows(DnaException.class, () -> mutantService.isMutant(DNA_INVALID_NITROGEN_BASE));
+        Exception exception = assertThrows(DnaException.class, () -> mutantService.isValid(DNA_INVALID_NITROGEN_BASE));
 
         String expectedMessage = "El ADN no puede tener bases nitrogenadas distintas a [A, T, C, G]";
         String actualMessage = exception.getMessage();
