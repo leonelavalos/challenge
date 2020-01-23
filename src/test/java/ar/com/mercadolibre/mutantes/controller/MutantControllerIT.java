@@ -40,30 +40,7 @@ public class MutantControllerIT {
     }
 
     @Test
-    public void testHumanIsNotMutant() throws Exception {
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", CONTENT_TYPE_JSON);
-
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.put("ATGCGA");
-        jsonArray.put("CAGTGC");
-        jsonArray.put("TTATTT");
-        jsonArray.put("AGACGG");
-        jsonArray.put("GCGTCA");
-        jsonArray.put("TCACTG");
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("dna", jsonArray);
-
-        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
-
-        ResponseEntity<String> response = template.postForEntity(baseUrl.toString() + "api/mutant", request, String.class);
-
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
-    }
-
-    @Test
-    public void testHumanIsMutant() throws Exception {
+    public void testIsMutantOK() throws Exception {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", CONTENT_TYPE_JSON);
@@ -86,7 +63,47 @@ public class MutantControllerIT {
     }
 
     @Test
-    public void testGetStats() throws Exception {
+    public void testIsMutantForbidden() throws Exception {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", CONTENT_TYPE_JSON);
+
+        JSONArray jsonArray = new JSONArray();
+        jsonArray.put("ATGCGA");
+        jsonArray.put("CAGTGC");
+        jsonArray.put("TTATTT");
+        jsonArray.put("AGACGG");
+        jsonArray.put("GCGTCA");
+        jsonArray.put("TCACTG");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("dna", jsonArray);
+
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
+
+        ResponseEntity<String> response = template.postForEntity(baseUrl.toString() + "api/mutant", request, String.class);
+
+        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
+    }
+
+    @Test
+    public void testIsMutantBadRequest() throws Exception {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", CONTENT_TYPE_JSON);
+
+        JSONArray jsonArray = new JSONArray();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("dna", jsonArray);
+
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
+
+        ResponseEntity<String> response = template.postForEntity(baseUrl.toString() + "api/mutant", request, String.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    public void testGetStats() {
         ResponseEntity<String> response = template.getForEntity(baseUrl.toString() + "/api/stats", String.class);;
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());

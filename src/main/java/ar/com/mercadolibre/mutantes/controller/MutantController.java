@@ -20,7 +20,7 @@ public class MutantController {
     @PostMapping(value = "mutant", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> isMutant(@RequestBody DnaDTO dna) {
         try {
-            if(mutantService.isMutant(dna.getDna()))
+            if(mutantService.isValid(dna.getDna()) && mutantService.isMutant(dna.getDna()))
                 return new ResponseEntity<>(HttpStatus.OK);
             else
                 return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -29,7 +29,7 @@ public class MutantController {
         }
     }
 
-    @GetMapping("stats")
+    @GetMapping(value = "stats", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getStats() {
         return ResponseEntity.status(HttpStatus.OK).body(mutantService.getStats());
     }

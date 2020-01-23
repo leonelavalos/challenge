@@ -15,15 +15,10 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class MutantServiceTest {
-
-    private final String[] DNA_MUTANT_DIAG = { "ACGGAG", "CAGGCA", "TCACAT", "TACACT", "ACGGGC", "GAGGCG" };
-    private final String[] DNA_MUTANT_H_V = { "AAAACT", "CTCTGC", "GAGAGT", "TCAGGT", "CACGGC", "ATTGCT" };
-    private final String[] DNA_NOT_MUTANT = { "ATGCCA", "CTGTGC", "TTATGT", "AGAAGG", "CCCCTA", "TCACTG" };
 
     @InjectMocks
     private MutantServiceImpl mutantService;
@@ -37,22 +32,97 @@ public class MutantServiceTest {
     }
 
     @Test
-    public void testHumanIsMutant() {
+    public void testExampleMeLi() {
+        String[] exampleMeLi = {
+                "ATGCGA",
+                "CAGTGC",
+                "TTATGT",
+                "AGAAGG",
+                "CCCCTA",
+                "TCACTG"
+        };
         verify(humanRepository, never()).save(Mockito.any(Human.class));
-        assertTrue(mutantService.isMutant(DNA_MUTANT_DIAG));
-        assertTrue(mutantService.isMutant(DNA_MUTANT_H_V));
+        assertTrue(mutantService.isMutant(exampleMeLi));
     }
 
     @Test
-    public void testHumanIsNotMutant() {
+    public void testHorizontalDNA() {
+        String[] horizontalDNA = {
+                "CCCCC",
+                "ATCGT",
+                "ATCGT",
+                "CTTTT",
+                "CAGAC"
+        };
         verify(humanRepository, never()).save(Mockito.any(Human.class));
-        assertFalse(mutantService.isMutant(DNA_NOT_MUTANT));
+        assertTrue(mutantService.isMutant(horizontalDNA));
+    }
+
+    @Test
+    public void testVerticualDNA() {
+        String[] verticalDNA = {
+                "CGCGC",
+                "ATCGT",
+                "ATCGT",
+                "CTCTT",
+                "CAGAT"
+        };
+        verify(humanRepository, never()).save(Mockito.any(Human.class));
+        assertTrue(mutantService.isMutant(verticalDNA));
+    }
+
+    @Test
+    public void testDiagonalDNA() {
+        String[] diagonalDNA = {
+                "CCACC",
+                "ACCGT",
+                "AACGT",
+                "CTACA",
+                "CAGAT"
+        };
+        verify(humanRepository, never()).save(Mockito.any(Human.class));
+        assertTrue(mutantService.isMutant(diagonalDNA));
+    }
+
+    @Test
+    public void testAntiDiagonalDNA() {
+        String[] antiDiagonalDNA = {
+                "CGCCC",
+                "ATCGT",
+                "ACGGT",
+                "CGCTT",
+                "GAGAG"
+        };
+        verify(humanRepository, never()).save(Mockito.any(Human.class));
+        assertTrue(mutantService.isMutant(antiDiagonalDNA));
+    }
+
+
+    @Test
+    public void testIsHuman() {
+        String[] humanDNA = {
+                "ATGCCA",
+                "CTGTGC",
+                "TTATGT",
+                "AGAAGG",
+                "CCCCTA",
+                "TCACTG"
+        };
+        verify(humanRepository, never()).save(Mockito.any(Human.class));
+        assertFalse(mutantService.isMutant(humanDNA));
     }
 
     @Test
     public void testGetStats() {
-        StatsDTO stats = mutantService.getStats();
-        assertNotNull(stats);
+
+        Long countHuman = 100L;
+        Long countMutant = 40L;
+        StatsDTO dto = new StatsDTO(countHuman, countMutant);
+
+        when(humanRepository.countByMutant(false)).thenReturn(countHuman);
+        when(humanRepository.countByMutant(true)).thenReturn(countMutant);
+
+        assertEquals(mutantService.getStats(), dto);
     }
 
 }
