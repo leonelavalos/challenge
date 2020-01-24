@@ -85,6 +85,8 @@ public class MutantServiceImpl implements MutantService {
         if (searchDiagonally(matrix)) return true;
 
         if (searchAntiDiagonally(matrix)) return true;
+
+        return false;
     }
     
     private boolean searchHorizontally(char[][] matrix) {
