@@ -42,6 +42,7 @@ El mismo se aloja en el siguiente directorio:
 ```
 $ cd target/site/jacoco-merged-test-coverage-report/index.html
 ```
+![Coverage](https://i.imgur.com/CyHgBbp.png)
 
 ## Deploy de la API
 
