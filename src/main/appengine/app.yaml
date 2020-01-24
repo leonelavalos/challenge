@@ -1,8 +1,6 @@
 runtime: java
 env: flex
 
-service: library
-
 handlers:
 - url: /.*
   script: this field is required, but ignored
