@@ -34,30 +34,13 @@ public class MutantServiceImpl implements MutantService {
     public boolean isMutant(String[] dna) {
 
         char[][] matrix = StringUtil.convertToCharArray(dna);
+        boolean isMutant = false;
         findedDna = 0;
 
-        if (searchHorizontally(matrix)) {
-            save(dna, true);
-            return true;
-        }
+        isMutant = analyzeDNA(matrix);
+        save(dna, isMutant);
 
-        if (searchVertically(matrix)){
-            save(dna, true);
-            return true;
-        }
-
-        if (searchDiagonally(matrix)){
-            save(dna, true);
-            return true;
-        }
-
-        if (searchAntiDiagonally(matrix)){
-            save(dna, true);
-            return true;
-        }
-
-        save(dna, false);
-        return false;
+        return isMutant;
     }
 
     @Override
@@ -92,6 +75,16 @@ public class MutantServiceImpl implements MutantService {
         Long countMutant = humanRepository.countByMutant(true);
 
         return new StatsDTO(countHuman, countMutant);
+    }
+
+    public boolean analyzeDNA(char[][] matrix) {
+        if (searchHorizontally(matrix)) return true;
+
+        if (searchVertically(matrix)) return true;
+
+        if (searchDiagonally(matrix)) return true;
+
+        if (searchAntiDiagonally(matrix)) return true;
     }
     
     private boolean searchHorizontally(char[][] matrix) {
