@@ -57,7 +57,7 @@ public class MutantServiceImpl implements MutantService {
         }
 
         save(dna, false);
-        return true;
+        return false;
     }
 
     @Override
