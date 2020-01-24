@@ -95,21 +95,16 @@ public class MutantServiceImpl implements MutantService {
     }
     
     private int searchHorizontally(char[][] matrix) {
-        int length = matrix.length;
         int findedDna = 0;
+        int length = matrix.length;
 
         for (int i = 0; i < length; i++) {
-            int repeatedChar = 1;
-            for (int j = 0; j < length - 1; j++) {
-                if (matrix[i][j] == matrix[i][j + 1]) {
-                    repeatedChar++;
-                } else {
-                    repeatedChar = 1;
-                }
-
-                if (repeatedChar > 3) {
+            for (int j = 0; j <= length - 4; j++) {
+                if (StringUtil.areEqual(matrix[i][j], matrix[i][j + 1], matrix[i][j + 2], matrix[i][j + 3])) {
                     findedDna++;
-                    repeatedChar = 1;
+                }
+                if (findedDna >= 2) {
+                    return findedDna;
                 }
             }
         }
@@ -118,21 +113,17 @@ public class MutantServiceImpl implements MutantService {
     }
 
     private int searchVertically(char[][] matrix) {
-        int length = matrix.length;
+
         int findedDna = 0;
+        int length = matrix.length;
 
         for (int j = 0; j < length; j++) {
-            int repeatedChar = 1;
-            for (int i = 0; i < length - 1; i++) {
-                if (matrix[i][j] == matrix[i + 1][j]) {
-                    repeatedChar++;
-                } else {
-                    repeatedChar = 1;
-                }
-
-                if (repeatedChar > 3) {
+            for (int i = 0; i <= length - 4; i++) {
+                if (StringUtil.areEqual(matrix[i][j], matrix[i + 1][j], matrix[i + 2][j], matrix[i + 3][j])) {
                     findedDna++;
-                    repeatedChar = 1;
+                }
+                if (findedDna >= 2) {
+                    return findedDna;
                 }
             }
         }
@@ -148,6 +139,7 @@ public class MutantServiceImpl implements MutantService {
             int repeatedChar = 1;
             for (int k=0; k < length; k++) {
                 if ((j + k + 1) < length) {
+
                     if (matrix[k][j + k] == matrix[k + 1 ][j + k + 1]) {
                         repeatedChar++;
                     } else {
@@ -158,6 +150,11 @@ public class MutantServiceImpl implements MutantService {
                         findedDna++;
                         repeatedChar = 1;
                     }
+
+                    if (findedDna >= 2) {
+                        return findedDna;
+                    }
+
                 } else {
                     break;
                 }
@@ -176,6 +173,10 @@ public class MutantServiceImpl implements MutantService {
                 if (repeatedChar > 3) {
                     findedDna++;
                     repeatedChar = 1;
+                }
+
+                if (findedDna >= 2) {
+                    return findedDna;
                 }
             }
         }
@@ -203,6 +204,10 @@ public class MutantServiceImpl implements MutantService {
                 if (repeatedChar > 3) {
                     findedDna++;
                     repeatedChar = 1;
+                }
+
+                if (findedDna >= 2) {
+                    return findedDna;
                 }
             }
         }
