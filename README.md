@@ -1,8 +1,9 @@
 # Mutantes API - Challenge MeLi
+[![codecov](https://codecov.io/gh/leonelavalos/challenge/branch/master/graph/badge.svg)](https://codecov.io/gh/leonelavalos/challenge)
 
-El desafio consiste en desarrollar una API REST para detectar si un ADN humano es mutante.
+El desafió consiste en desarrollar una API REST para detectar si un ADN humano es mutante.
 
-## Tecnologias
+## Tecnologías
 
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [MongoDB](https://www.mongodb.com/es)
@@ -11,7 +12,7 @@ El desafio consiste en desarrollar una API REST para detectar si un ADN humano e
 - [JUnit 5](https://junit.org/junit5/)
 - [Mockito 3](https://site.mockito.org/)
 
-## Instalacion
+## Instalación
 
 Es necesario tener instalado:
 
@@ -26,7 +27,7 @@ $ cd challenge
 $ mvn clean package
 $ mvn spring-boot:run
 ```
-De esta manera, la aplicacion se encontraria levantada en 'http://localhost:8080/' y habria que utilizar esta URL si quisieramos probar localmente las APIs a traves de [Postman](https://www.getpostman.com/) por ejemplo.
+De esta manera, la aplicación se encontraría levantada en 'http://localhost:8080/' y habría que utilizar esta URL si quisiéramos probar localmente las APIs a través de [Postman](https://www.getpostman.com/) por ejemplo.
 
 ## Tests
 
@@ -35,21 +36,22 @@ Para correr los test, nos posicionamos en el directorio del proyecto y corremos 
 ```
 $ mvn verify
 ```
-Ademas, al correr dicho comando, se genera un reporte del coverage tanto de los tests unitarios como el de integracion.
+Ademas, al correr dicho comando, se genera un reporte del coverage tanto de los tests unitarios como los de integración.
 El mismo se aloja en el siguiente directorio:
 
 ```
 $ cd target/site/jacoco-merged-test-coverage-report/index.html
 ```
+![Coverage](https://i.imgur.com/CyHgBbp.png)
 
 ## Deploy de la API
 
-Al no haber utilizado nunca la plataforma de Google Cloud, me decidi por ella.
-Cree una instancia de una maquina virtual, permitiendo el trafico http.
+Al no haber utilizado nunca la plataforma de Google Cloud, me decidí por ella.
+Creé una instancia de una maquina virtual, permitiendo el tráfico HTTP.
 
-A diferencia del ambiente de desarrollo, donde la base de datos de MongoDB se almacenaba localmente, configure una base de datos en la nube con [MongoDB Atlas](https://www.mongodb.com/cloud/atlas), consiguiendo un Cluster del tipo replica divido en tres nodos.
+A diferencia del ambiente de desarrollo, donde la base de datos de MongoDB se almacena localmente, configure una base de datos en la nube con [MongoDB Atlas](https://www.mongodb.com/cloud/atlas), consiguiendo un Cluster del tipo replica divido en tres nodos.
 
-Por lo que hubo que hacer una conexion peering entre el Cluster y Google Cloud para poder permitir el acceso remoto.
+Por lo que hubo que hacer una conexión peering entre el Cluster y Google Cloud para poder permitir el acceso remoto.
 
 HOST: https://mutantes-app.appspot.com
 
