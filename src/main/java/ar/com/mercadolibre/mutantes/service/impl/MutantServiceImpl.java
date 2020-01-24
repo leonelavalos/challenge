@@ -36,15 +36,28 @@ public class MutantServiceImpl implements MutantService {
         char[][] matrix = StringUtil.convertToCharArray(dna);
         findedDna = 0;
 
-        if (searchHorizontally(matrix)) return true;
+        if (searchHorizontally(matrix)) {
+            save(dna, true);
+            return true;
+        }
 
-        if (searchVertically(matrix)) return true;
+        if (searchVertically(matrix)){
+            save(dna, true);
+            return true;
+        }
 
-        if (searchDiagonally(matrix)) return true;
+        if (searchDiagonally(matrix)){
+            save(dna, true);
+            return true;
+        }
 
-        if (searchAntiDiagonally(matrix)) return true;
+        if (searchAntiDiagonally(matrix)){
+            save(dna, true);
+            return true;
+        }
 
-        return false;
+        save(dna, false);
+        return true;
     }
 
     @Override
