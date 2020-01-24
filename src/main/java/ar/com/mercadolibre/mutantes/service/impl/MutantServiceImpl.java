@@ -18,7 +18,11 @@ public class MutantServiceImpl implements MutantService {
 
     private static final String ALLOWED_NITROGEN_BASES = "[ATCG]+";
 
-    private static final int MINIMUM_DNA_SEQUENCE = 4;
+    private static final int MINIMUM_GEN_SEQUENCE = 4;
+
+    private static final int VALID_SEQUENCE_COUNT = 2;
+
+    private int findedDna;
 
     @Autowired
     private HumanRepository humanRepository;
@@ -30,34 +34,17 @@ public class MutantServiceImpl implements MutantService {
     public boolean isMutant(String[] dna) {
 
         char[][] matrix = StringUtil.convertToCharArray(dna);
-        int findedDna = 0;
+        findedDna = 0;
 
-        findedDna = searchHorizontally(matrix);
+        if (searchHorizontally(matrix)) return true;
 
-        if (findedDna > 1) {
-            save(dna, true);
-            return true;
-        }
+        if (searchVertically(matrix)) return true;
 
-        findedDna += searchVertically(matrix);
+        if (searchDiagonally(matrix)) return true;
 
-        if (findedDna > 1) {
-            save(dna, true);
-            return true;
-        }
+        if (searchAntiDiagonally(matrix)) return true;
 
-        findedDna += searchDiagonally(matrix);
-
-        if (findedDna > 1) {
-            save(dna, true);
-            return true;
-        }
-
-        findedDna += searchAntiDiagonally(matrix);
-
-        save(dna, findedDna > 1);
-
-        return findedDna > 1;
+        return false;
     }
 
     @Override
@@ -68,7 +55,7 @@ public class MutantServiceImpl implements MutantService {
         if(Stream.of(dna).anyMatch(String::isEmpty))
             throw new DnaException(messageService.getMessage("dna.sequence.empty"));
 
-        if(dna.length < MINIMUM_DNA_SEQUENCE)
+        if(dna.length < MINIMUM_GEN_SEQUENCE)
             throw new DnaException(messageService.getMessage("dna.sequence.minimum.mutant"));
 
         if(Stream.of(dna).anyMatch(s -> s.length() != dna.length))
@@ -94,65 +81,63 @@ public class MutantServiceImpl implements MutantService {
         return new StatsDTO(countHuman, countMutant);
     }
     
-    private int searchHorizontally(char[][] matrix) {
-        int findedDna = 0;
+    private boolean searchHorizontally(char[][] matrix) {
         int length = matrix.length;
 
         for (int i = 0; i < length; i++) {
-            for (int j = 0; j <= length - 4; j++) {
+            for (int j = 0; j <= length - MINIMUM_GEN_SEQUENCE; j++) {
                 if (StringUtil.areEqual(matrix[i][j], matrix[i][j + 1], matrix[i][j + 2], matrix[i][j + 3])) {
                     findedDna++;
+                    j += MINIMUM_GEN_SEQUENCE;
                 }
-                if (findedDna >= 2) {
-                    return findedDna;
+                if (findedDna >= VALID_SEQUENCE_COUNT) {
+                    return true;
                 }
             }
         }
 
-        return findedDna;
+        return false;
     }
 
-    private int searchVertically(char[][] matrix) {
-
-        int findedDna = 0;
+    private boolean searchVertically(char[][] matrix) {
         int length = matrix.length;
 
         for (int j = 0; j < length; j++) {
-            for (int i = 0; i <= length - 4; i++) {
+            for (int i = 0; i <= length - MINIMUM_GEN_SEQUENCE; i++) {
                 if (StringUtil.areEqual(matrix[i][j], matrix[i + 1][j], matrix[i + 2][j], matrix[i + 3][j])) {
                     findedDna++;
+                    i += MINIMUM_GEN_SEQUENCE;
                 }
-                if (findedDna >= 2) {
-                    return findedDna;
+                if (findedDna >= VALID_SEQUENCE_COUNT) {
+                    return true;
                 }
             }
         }
 
-        return findedDna;
+        return false;
     }
 
-    private int searchDiagonally(char[][] matrix) {
+    private boolean searchDiagonally(char[][] matrix) {
         int length = matrix.length;
-        int findedDna = 0;
 
         for (int j = length-1; j >= 0; j--) {
-            int repeatedChar = 1;
+            int consecutiveGen = 1;
             for (int k=0; k < length; k++) {
                 if ((j + k + 1) < length) {
 
                     if (matrix[k][j + k] == matrix[k + 1 ][j + k + 1]) {
-                        repeatedChar++;
+                        consecutiveGen++;
                     } else {
-                        repeatedChar = 1;
+                        consecutiveGen = 1;
                     }
 
-                    if (repeatedChar > 3) {
+                    if (consecutiveGen >= MINIMUM_GEN_SEQUENCE) {
                         findedDna++;
-                        repeatedChar = 1;
+                        consecutiveGen = 1;
                     }
 
-                    if (findedDna >= 2) {
-                        return findedDna;
+                    if (findedDna >= VALID_SEQUENCE_COUNT) {
+                        return true;
                     }
 
                 } else {
@@ -162,56 +147,55 @@ public class MutantServiceImpl implements MutantService {
         }
 
         for (int i = 1; i < length; i++) {
-            int repeatedChar = 1;
+            int consecutiveGen = 1;
             for (int j = i, k = 0; j < matrix.length - 1 && k < matrix.length; j++, k++){
                 if (matrix[j][k] == matrix[j + 1][k + 1]){
-                    repeatedChar++;
+                    consecutiveGen++;
                 } else {
-                    repeatedChar = 1;
+                    consecutiveGen = 1;
                 }
 
-                if (repeatedChar > 3) {
+                if (consecutiveGen >= MINIMUM_GEN_SEQUENCE) {
                     findedDna++;
-                    repeatedChar = 1;
+                    consecutiveGen = 1;
                 }
 
-                if (findedDna >= 2) {
-                    return findedDna;
+                if (findedDna >= VALID_SEQUENCE_COUNT) {
+                    return true;
                 }
             }
         }
 
-        return findedDna;
+        return false;
     }
 
-    private int searchAntiDiagonally(char[][] matrix) {
+    private boolean searchAntiDiagonally(char[][] matrix) {
         int length = matrix.length;
-        int findedDna = 0;
 
         for (int k = 0; k <= 2 * (length - 1); ++k) {
-            int repeatedChar = 1;
+            int consecutiveGen = 1;
             int jMin = Math.max(0, k - matrix.length + 1);
             int jMax = Math.min(matrix.length - 1, k);
             for (int j = jMin; j < jMax; ++j) {
                 int i = k - j;
 
                 if (matrix[j][i] == matrix[j + 1][i - 1]) {
-                    repeatedChar++;
+                    consecutiveGen++;
                 } else {
-                    repeatedChar = 1;
+                    consecutiveGen = 1;
                 }
 
-                if (repeatedChar > 3) {
+                if (consecutiveGen >= MINIMUM_GEN_SEQUENCE) {
                     findedDna++;
-                    repeatedChar = 1;
+                    consecutiveGen = 1;
                 }
 
-                if (findedDna >= 2) {
-                    return findedDna;
+                if (findedDna >= VALID_SEQUENCE_COUNT) {
+                    return true;
                 }
             }
         }
 
-        return findedDna;
+        return false;
     }
 }
