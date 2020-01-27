@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @Service
@@ -32,6 +33,10 @@ public class MutantServiceImpl implements MutantService {
 
     @Override
     public boolean isMutant(String[] dna) {
+
+        Optional<Human> human = humanRepository.findByDna(dna);
+        if(human.isPresent())
+            return human.get().isMutant();
 
         char[][] matrix = StringUtil.convertToCharArray(dna);
         boolean isMutant = false;
