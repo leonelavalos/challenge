@@ -23,8 +23,6 @@ public class MutantServiceImpl implements MutantService {
 
     private static final int VALID_SEQUENCE_COUNT = 2;
 
-    private int findedDna;
-
     @Autowired
     private HumanRepository humanRepository;
 
@@ -36,11 +34,10 @@ public class MutantServiceImpl implements MutantService {
 
         Optional<Human> human = humanRepository.findByDna(dna);
         if(human.isPresent())
-            return human.get().isMutant();
+           return human.get().isMutant();
 
         char[][] matrix = StringUtil.convertToCharArray(dna);
-        boolean isMutant = false;
-        findedDna = 0;
+        boolean isMutant;
 
         isMutant = analyzeDNA(matrix);
         save(dna, isMutant);
@@ -83,18 +80,28 @@ public class MutantServiceImpl implements MutantService {
     }
 
     public boolean analyzeDNA(char[][] matrix) {
-        if (searchHorizontally(matrix)) return true;
+        int findedDna = 0;
 
-        if (searchVertically(matrix)) return true;
+        findedDna = searchHorizontally(matrix, findedDna);
+        if(findedDna >= VALID_SEQUENCE_COUNT)
+            return true;
 
-        if (searchDiagonally(matrix)) return true;
+        findedDna = searchVertically(matrix, findedDna);
+        if(findedDna >= VALID_SEQUENCE_COUNT)
+            return true;
 
-        if (searchAntiDiagonally(matrix)) return true;
+        findedDna = searchAntiDiagonally(matrix, findedDna);
+        if(findedDna >= VALID_SEQUENCE_COUNT)
+            return true;
+
+        findedDna = searchDiagonally(matrix, findedDna);
+        if(findedDna >= VALID_SEQUENCE_COUNT)
+            return true;
 
         return false;
     }
     
-    private boolean searchHorizontally(char[][] matrix) {
+    private int searchHorizontally(char[][] matrix, int findedDna) {
         int length = matrix.length;
 
         for (int i = 0; i < length; i++) {
@@ -104,15 +111,15 @@ public class MutantServiceImpl implements MutantService {
                     j += MINIMUM_GEN_SEQUENCE;
                 }
                 if (findedDna >= VALID_SEQUENCE_COUNT) {
-                    return true;
+                    return VALID_SEQUENCE_COUNT;
                 }
             }
         }
 
-        return false;
+        return findedDna;
     }
 
-    private boolean searchVertically(char[][] matrix) {
+    private int searchVertically(char[][] matrix, int findedDna) {
         int length = matrix.length;
 
         for (int j = 0; j < length; j++) {
@@ -122,15 +129,15 @@ public class MutantServiceImpl implements MutantService {
                     i += MINIMUM_GEN_SEQUENCE;
                 }
                 if (findedDna >= VALID_SEQUENCE_COUNT) {
-                    return true;
+                    return VALID_SEQUENCE_COUNT;
                 }
             }
         }
 
-        return false;
+        return findedDna;
     }
 
-    private boolean searchDiagonally(char[][] matrix) {
+    private int searchDiagonally(char[][] matrix, int findedDna) {
         int length = matrix.length;
 
         for (int j = length-1; j >= 0; j--) {
@@ -150,7 +157,7 @@ public class MutantServiceImpl implements MutantService {
                     }
 
                     if (findedDna >= VALID_SEQUENCE_COUNT) {
-                        return true;
+                        return VALID_SEQUENCE_COUNT;
                     }
 
                 } else {
@@ -174,15 +181,15 @@ public class MutantServiceImpl implements MutantService {
                 }
 
                 if (findedDna >= VALID_SEQUENCE_COUNT) {
-                    return true;
+                    return VALID_SEQUENCE_COUNT;
                 }
             }
         }
 
-        return false;
+        return findedDna;
     }
 
-    private boolean searchAntiDiagonally(char[][] matrix) {
+    private int searchAntiDiagonally(char[][] matrix, int findedDna) {
         int length = matrix.length;
 
         for (int k = 0; k <= 2 * (length - 1); ++k) {
@@ -204,11 +211,11 @@ public class MutantServiceImpl implements MutantService {
                 }
 
                 if (findedDna >= VALID_SEQUENCE_COUNT) {
-                    return true;
+                    return VALID_SEQUENCE_COUNT;
                 }
             }
         }
 
-        return false;
+        return findedDna;
     }
 }
