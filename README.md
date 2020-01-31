@@ -53,7 +53,7 @@ A diferencia del ambiente de desarrollo, donde la base de datos de MongoDB se al
 
 Por lo que hubo que hacer una conexión peering entre el Cluster y Google Cloud para poder permitir el acceso remoto.
 
-HOST: https://mutantes-app.appspot.com
+HOST: https://mutantes-app.appspot.com (Por una cuestion de facturacion se ha dado de baja)
 
 
 ## Usos
